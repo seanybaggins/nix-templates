@@ -10,7 +10,7 @@
 stdenv.mkDerivation (finalAttrs: {
   pname = "hello";
 
-  version = "2.12.1";
+  version = "2.12.0";
 
   src = fetchurl {
     url = "mirror://gnu/hello/hello-${finalAttrs.version}.tar.gz";
