@@ -10,11 +10,12 @@
 stdenv.mkDerivation (finalAttrs: {
   pname = "hello";
 
-  version = "2.12.0";
+  # This value was overriden from 2.12.1 to 2.12
+  version = "2.12";
 
   src = fetchurl {
     url = "mirror://gnu/hello/hello-${finalAttrs.version}.tar.gz";
-    sha256 = "sha256-jZkUKv2SV28wsM18tCqNxoCZmLxdYH2Idh9RLibH2yA=";
+    sha256 = "sha256-zwSvhtwIUmjF9EcPuuSbGK+8Iht4CWqrhC2TSna60Ks=";
   };
 
   doCheck = true;

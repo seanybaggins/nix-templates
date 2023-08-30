@@ -11,7 +11,7 @@
           inherit system;
 
           # Add your overlays in the ./nix/overlays directory
-          #overlays = (import ./nix/overlays);         
+          overlays = [ (import ./nix/overlays) ];
 
           # Special nixpkgs configs go here
           #config = {
@@ -24,11 +24,14 @@
         };
       in
       {
+        # The hello package can be built by running `nix build '.#hello'`
         packages = {
           hello = pkgs.hello;
         };
 
-        defaultPackage = self.packages.${system}.hello;
+        # If you uncomment this line. You will be able build the hello package
+        # by simply invoking `nix build`
+        #defaultPackage = self.packages.${system}.hello;
       }
     );
 }
