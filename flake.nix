@@ -5,6 +5,7 @@
     templates = {
       default = {
         path = ./default;
+        description = "A good starting flake";
       };
     };
   };
