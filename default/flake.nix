@@ -1,37 +1,48 @@
 {
-  description = "A good starting flake";
+  description = "A good starting flake for a project to use nix as a package manager";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-  inputs.flake-utils.url = "github:numtide/flake-utils";
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs {
-          inherit system;
+  outputs = { self, nixpkgs } @ inputs:
+    let
+      supportedSystems = [ "x86_64-linux" ];
+      # Function to make the flake usable across machines with different system
+      # architectures. See devShells and packages for usage.
+      eachSupportedSystem = f: nixpkgs.lib.genAttrs supportedSystems (system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ self.overlays.default ]; # ++ overlays from other flakes
+            config = {
+              allowUnfree = true;
+              #  permittedInsecurePackages = [
+              #     Usually some python version
+              #  ];
+            };
+          };
+        in
+        f pkgs);
+    in
+    {
+      # set of overlays provided by only this flake
+      overlays.default = import ./nix/overlays/default.nix;
 
-          # Add your overlays in the ./nix/overlays directory
-          overlays = [ (import ./nix/overlays) ];
+      packages = eachSupportedSystem (pkgs: {
+        hello = pkgs.hello;
 
-          # Special nixpkgs configs go here
-          #config = {
-          #  allowUnfree = true;
-          #  permittedInsecurePackages = [
-          #     Usually some python version
-          #  ];
-          #}
+        # for testing. This causes an error with nix flake show but still works
+        # with nix build .#pkgs.yourpackage as intended
+        # pkgs = pkgs;
+      });
 
-        };
-      in
-      {
-        # The hello package can be built by running `nix build '.#hello'`
-        packages = {
-          hello = pkgs.hello;
-        };
-
-        # If you uncomment this line. You will be able build the hello package
-        # by simply invoking `nix build`
-        #defaultPackage = self.packages.${system}.hello;
-      }
-    );
+      devShells = eachSupportedSystem
+        (pkgs: {
+          default = pkgs.mkShell
+            {
+              buildInputs = with pkgs;[
+                cmake
+              ];
+            };
+        });
+    };
 }
