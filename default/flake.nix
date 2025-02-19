@@ -12,7 +12,10 @@
         let
           pkgs = import nixpkgs {
             inherit system;
-            overlays = [ self.overlays.default ]; # ++ overlays from other flakes
+            overlays = [
+              self.overlays.default
+              # inputs.someOtherFlake.overlays.default
+            ];
             config = {
               allowUnfree = true;
               #  permittedInsecurePackages = [
