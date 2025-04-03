@@ -5,47 +5,43 @@
 
   outputs = { self, nixpkgs } @ inputs:
     let
-      supportedSystems = [ "x86_64-linux" ];
-      # Function to make the flake usable across machines with different system
-      # architectures. See devShells and packages for usage.
-      eachSupportedSystem = f: nixpkgs.lib.genAttrs supportedSystems (system:
-        let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [
-              self.overlays.default
-              # inputs.someOtherFlake.overlays.default
-            ];
-            config = {
-              allowUnfree = true;
-              #  permittedInsecurePackages = [
-              #     Usually some python version
-              #  ];
-            };
-          };
-        in
-        f pkgs);
+      pkgs = import nixpkgs {
+        system = "x86_64-linux";
+        overlays = [
+          self.overlays.default
+          # inputs.someOtherFlake.overlays.default
+        ];
+        config = {
+          allowUnfree = true;
+          #  permittedInsecurePackages = [
+          #     Usually some python version
+          #  ];
+        };
+      };
     in
     {
       # set of overlays provided by only this flake
       overlays.default = import ./nix/overlays/default.nix;
 
-      packages = eachSupportedSystem (pkgs: {
+      # for testing. This causes an error with nix flake show but still works
+      # with nix build .#pkgs.yourpackage as intended
+      pkgs = pkgs;
+
+      packages.x86_64-linux = {
         hello = pkgs.hello;
+      };
 
-        # for testing. This causes an error with nix flake show but still works
-        # with nix build .#pkgs.yourpackage as intended
-        # pkgs = pkgs;
-      });
+      checks.x86_64-linux = {
+        default = pkgs.hello;
+      };
 
-      devShells = eachSupportedSystem
-        (pkgs: {
-          default = pkgs.mkShell
-            {
-              buildInputs = with pkgs;[
-                cmake
-              ];
-            };
-        });
+      devShells = {
+        default = pkgs.mkShell
+          {
+            buildInputs = with pkgs;[
+              cmake
+            ];
+          };
+      };
     };
 }
