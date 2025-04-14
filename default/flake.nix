@@ -43,7 +43,7 @@
 
       # The development environment that gets triggered when using direnv and
       # cding into the directory that contains this flake file or below
-      devShells = {
+      devShells.x86_64-linux = {
         default = pkgs.mkShell {
           buildInputs = with pkgs; [
             cmake
