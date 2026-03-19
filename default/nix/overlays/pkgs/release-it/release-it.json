@@ -1,0 +1,30 @@
+{
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": "conventionalcommits",
+      "infile": "CHANGELOG.md"
+    },
+    "@release-it/bumper": {
+      "in": {
+        "file": "VERSION",
+        "type": "text/plain"
+      },
+      "out": {
+        "file": "VERSION",
+        "type": "text/plain"
+      }
+    }
+  },
+  "git": {
+    "commit": true,
+    "commitMessage": "fix: release ${version} [skip ci]",
+    "tag": true,
+    "push": true
+  },
+  "npm": {
+    "publish": false
+  },
+  "github": true,
+  "gitlab": false
+}
+
